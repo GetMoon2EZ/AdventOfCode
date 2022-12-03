@@ -1,3 +1,9 @@
-# Prompt of the day
+# Day X:
 
-**INSERT_PROMPT_HERE**
+## Part One
+
+**INSERT_PART_ONE_PROMPT**
+
+## Part Two
+
+**INSERT_PART_TWO_PROMPT**

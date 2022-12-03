@@ -1,8 +1,6 @@
-# Prompt of the day
+# Day 3: Rucksack Reorganization
 
-## Day 3: Rucksack Reorganization
-
-### Part One
+## Part One
 
 One Elf has the important job of loading all of the rucksacks with supplies for the jungle journey. Unfortunately, that Elf didn't quite follow the packing instructions, and so a few items now need to be rearranged.
 
@@ -84,7 +82,7 @@ Your puzzle answer was 7850.
 
 The first half of this puzzle is complete! It provides one gold star: *
 
-### Part Two
+## Part Two
 
 As you finish identifying the misplaced items, the Elves come to you with another issue.
 
