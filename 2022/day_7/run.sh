@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 LRED='\033[1;31m'   # Light Red
 LGREEN='\033[1;32m' # Light Green
 LCYAN='\033[1;36m'  # Light Cyan
