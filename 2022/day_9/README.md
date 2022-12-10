@@ -1,21 +1,11 @@
-# Day 9: Rope Bridge
-
-## Part One
-
-This rope bridge creaks as you walk along it. You aren't sure how old it is, or whether it can even support your weight.
-
-It seems to support the Elves just fine, though. The bridge spans a gorge which was carved out by the massive river far below you.
-
-You step carefully; as you do, the ropes stretch and twist. You decide to distract yourself by modeling rope physics; maybe you can even figure out where **not** to step.
-
-Consider a rope with a knot at each end; these knots mark the **head** and the **tail** of the rope. If the head moves far enough away from the tail, the tail is pulled toward the head.
-
-Due to nebulous reasoning involving **Planck lengths**, you should be able to model the positions of the knots on a two-dimensional grid. Then, by following a hypothetical **series of motions** (your puzzle input) for the head, you can determine how the tail will move.
-
-Due to the aforementioned Planck lengths, the rope must be quite short; in fact, the head (`H`) and tail (`T`) must **always be touching** (diagonally adjacent and even overlapping both count as touching):
-
-```
-....
+<main>
+<article class="day-desc"><h1>--- Day 9: Rope Bridge ---</h1><h2>--- Part One ---</h2><p>This rope bridge creaks as you walk along it. You aren't sure how old it is, or whether it can even support your weight.</p>
+<p>It seems to support the Elves just fine, though. The bridge spans a gorge which was carved out by the massive river far below you.</p>
+<p>You step carefully; as you do, the ropes stretch and twist. You decide to distract yourself by modeling rope physics; maybe you can even figure out where <em>not</em> to step.</p>
+<p>Consider a rope with a knot at each end; these knots mark the <em>head</em> and the <em>tail</em> of the rope. If the head moves far enough away from the tail, the tail is pulled toward the head.</p>
+<p>Due to nebulous reasoning involving <a href="https://en.wikipedia.org/wiki/Planck_units#Planck_length" target="_blank">Planck lengths</a>, you should be able to model the positions of the knots on a two-dimensional grid. Then, by following a hypothetical <em>series of motions</em> (your puzzle input) for the head, you can determine how the tail will move.</p>
+<p><span title="I&#39;m an engineer, not a physicist!">Due to the aforementioned Planck lengths</span>, the rope must be quite short; in fact, the head (<code>H</code>) and tail (<code>T</code>) must <em>always be touching</em> (diagonally adjacent and even overlapping both count as touching):</p>
+<pre><code>....
 .TH.
 ....
 
@@ -27,44 +17,34 @@ Due to the aforementioned Planck lengths, the rope must be quite short; in fact,
 ...
 .H. (H covers T)
 ...
-```
-
-If the head is ever two steps directly up, down, left, or right from the tail, the tail must also move one step in that direction so it remains close enough:
-
-```
-.....    .....    .....
-.TH.. -> .T.H. -> ..TH.
+</code></pre>
+<p>If the head is ever two steps directly up, down, left, or right from the tail, the tail must also move one step in that direction so it remains close enough:</p>
+<pre><code>.....    .....    .....
+.TH.. -&gt; .T.H. -&gt; ..TH.
 .....    .....    .....
 
 ...    ...    ...
 .T.    .T.    ...
-.H. -> ... -> .T.
+.H. -&gt; ... -&gt; .T.
 ...    .H.    .H.
 ...    ...    ...
-```
-
-Otherwise, if the head and tail aren't touching and aren't in the same row or column, the tail always moves one step diagonally to keep up:
-
-```
-.....    .....    .....
+</code></pre>
+<p>Otherwise, if the head and tail aren't touching and aren't in the same row or column, the tail always moves one step diagonally to keep up:</p>
+<pre><code>.....    .....    .....
 .....    ..H..    ..H..
-..H.. -> ..... -> ..T..
+..H.. -&gt; ..... -&gt; ..T..
 .T...    .T...    .....
 .....    .....    .....
 
 .....    .....    .....
 .....    .....    .....
-..H.. -> ...H. -> ..TH.
+..H.. -&gt; ...H. -&gt; ..TH.
 .T...    .T...    .....
 .....    .....    .....
-```
-
-You just need to work out where the tail goes as the head follows a series of motions. Assume the head and the tail both start at the same position, overlapping.
-
-For example:
-
-```
-R 4
+</code></pre>
+<p>You just need to work out where the tail goes as the head follows a series of motions. Assume the head and the tail both start at the same position, overlapping.</p>
+<p>For example:</p>
+<pre><code>R 4
 U 4
 L 3
 D 1
@@ -72,12 +52,9 @@ R 4
 D 1
 L 5
 R 2
-```
-
-This series of motions moves the head **right** four steps, then **up** four steps, then **left** three steps, then **down** one step, and so on. After each step, you'll need to update the position of the tail if the step means the head is no longer adjacent to the tail. Visually, these motions occur as follows (s marks the starting position as a reference point):
-
-```
-== Initial State ==
+</code></pre>
+<p>This series of motions moves the head <em>right</em> four steps, then <em>up</em> four steps, then <em>left</em> three steps, then <em>down</em> one step, and so on. After each step, you'll need to update the position of the tail if the step means the head is no longer adjacent to the tail. Visually, these motions occur as follows (<code>s</code> marks the starting position as a reference point):</p>
+<pre><code>== Initial State ==
 
 ......
 ......
@@ -244,34 +221,22 @@ s.....
 .TH...
 ......
 s.....
-```
-
-After simulating the rope, you can count up all of the positions the **tail visited at least once**. In this diagram, `s` again marks the starting position (which the tail also visited) and `#` marks other positions the tail visited:
-
-```
-..##..
+</code></pre>
+<p>After simulating the rope, you can count up all of the positions the <em>tail visited at least once</em>. In this diagram, <code>s</code> again marks the starting position (which the tail also visited) and <code>#</code> marks other positions the tail visited:</p>
+<pre><code>..##..
 ...##.
 .####.
 ....#.
 s###..
-```
-
-So, there are **`13`** positions the tail visited at least once.
-
-Simulate your complete hypothetical series of motions. **How many positions does the tail of the rope visit at least once?**
-
-## Part Two
-
-A rope snaps! Suddenly, the river is getting a lot closer than you remember. The bridge is still there, but some of the ropes that broke are now whipping toward you as you fall through the air!
-
-The ropes are moving too quickly to grab; you only have a few seconds to choose how to arch your body to avoid being hit. Fortunately, your simulation can be extended to support longer ropes.
-
-Rather than two knots, you now must simulate a rope consisting of **ten** knots. One knot is still the head of the rope and moves according to the series of motions. Each knot further down the rope follows the knot in front of it using the same rules as before.
-
-Using the same series of motions as the above example, but with the knots marked `H`, `1`, `2`, ..., `9`, the motions now occur as follows:
-
-```
-== Initial State ==
+</code></pre>
+<p>So, there are <code><em>13</em></code> positions the tail visited at least once.</p>
+<p>Simulate your complete hypothetical series of motions. <em>How many positions does the tail of the rope visit at least once?</em></p>
+</article>
+<article class="day-desc"><h2 id="part2">--- Part Two ---</h2><p>A rope snaps! Suddenly, the river is getting a lot closer than you remember. The bridge is still there, but some of the ropes that broke are now whipping toward you as you fall through the air!</p>
+<p>The ropes are moving too quickly to grab; you only have a few seconds to choose how to arch your body to avoid being hit. Fortunately, your simulation can be extended to support longer ropes.</p>
+<p>Rather than two knots, you now must simulate a rope consisting of <em>ten</em> knots. One knot is still the head of the rope and moves according to the series of motions. Each knot further down the rope follows the knot in front of it using the same rules as before.</p>
+<p>Using the same series of motions as the above example, but with the knots marked <code>H</code>, <code>1</code>, <code>2</code>, ..., <code>9</code>, the motions now occur as follows:</p>
+<pre><code>== Initial State ==
 
 ......
 ......
@@ -438,14 +403,10 @@ H123..  (2 covers 4)
 .1H3..  (H covers 2, 4)
 .5....
 6.....  (6 covers 7, 8, 9, s)
-```
-
-Now, you need to keep track of the positions the new tail, `9`, visits. In this example, the tail never moves, and so it only visits `1` position. However, **be careful**: more types of motion are possible than before, so you might want to visually compare your simulated rope to the one above.
-
-Here's a larger example:
-
-```
-R 5
+</code></pre>
+<p>Now, you need to keep track of the positions the new tail, <code>9</code>, visits. In this example, the tail never moves, and so it only visits <code><em>1</em></code> position. However, <em>be careful</em>: more types of motion are possible than before, so you might want to visually compare your simulated rope to the one above.</p>
+<p>Here's a larger example:</p>
+<pre><code>R 5
 U 8
 L 8
 D 3
@@ -453,12 +414,9 @@ R 17
 D 10
 L 25
 U 20
-```
-
-These motions occur as follows (individual steps are not shown):
-
-```
-== Initial State ==
+</code></pre>
+<p>These motions occur as follows (individual steps are not shown):</p>
+<pre><code>== Initial State ==
 
 ..........................
 ..........................
@@ -673,12 +631,10 @@ H.........................
 ..........................
 ..........................
 ..........................
-```
 
-Now, the tail (`9`) visits `36` positions (including `s`) at least once:
-
-```
-..........................
+</code></pre>
+<p>Now, the tail (<code>9</code>) visits <code><em>36</em></code> positions (including <code>s</code>) at least once:</p>
+<pre><code>..........................
 ..........................
 ..........................
 ..........................
@@ -699,6 +655,7 @@ Now, the tail (`9`) visits `36` positions (including `s`) at least once:
 .......#..........#.......
 ........#........#........
 .........########.........
-```
-
-Simulate your complete series of motions on a larger rope with ten knots. **How many positions does the tail of the rope visit at least once?**
+</code></pre>
+<p>Simulate your complete series of motions on a larger rope with ten knots. <em>How many positions does the tail of the rope visit at least once?</em></p>
+</article>
+</main>
