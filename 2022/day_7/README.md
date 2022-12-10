@@ -1,22 +1,12 @@
-# Day 7: No Space Left On Device
-
-## Part One
-
-You can hear birds chirping and raindrops hitting leaves as the expedition proceeds. Occasionally, you can even hear much louder sounds in the distance; how big do the animals get out here, anyway?
-
-The device the Elves gave you has problems with more than just its communication system. You try to run a system update:
-
-```
-$ system-update --please --pretty-please-with-sugar-on-top
-Error: No space left on device
-```
-
-Perhaps you can delete some files to make space for the update?
-
-You browse around the filesystem to assess the situation and save the resulting terminal output (your puzzle input). For example:
-
-```
-$ cd /
+<main>
+<article class="day-desc"><h1>--- Day 7: No Space Left On Device ---</h1><h2>--- Part One ---</h2><p>You can hear birds chirping and raindrops hitting leaves as the expedition proceeds. Occasionally, you can even hear much louder sounds in the distance; how big do the animals get out here, anyway?</p>
+<p>The device the Elves gave you has problems with more than just its communication system. You try to run a system update:</p>
+<pre><code>$ system-update --please --pretty-please-with-sugar-on-top
+<span title="E099 PROGRAMMER IS OVERLY POLITE">Error</span>: No space left on device
+</code></pre>
+<p>Perhaps you can delete some files to make space for the update?</p>
+<p>You browse around the filesystem to assess the situation and save the resulting terminal output (your puzzle input). For example:</p>
+<pre><code>$ cd /
 $ ls
 dir a
 14848514 b.txt
@@ -39,24 +29,26 @@ $ ls
 8033020 d.log
 5626152 d.ext
 7214296 k
-```
-
-The filesystem consists of a tree of files (plain data) and directories (which can contain other directories or files). The outermost directory is called /. You can navigate around the filesystem, moving into or out of directories and listing the contents of the directory you're currently in.
-
-Within the terminal output, lines that begin with `$` are **commands you executed**, very much like some modern computers:
-
-* `cd` means **change directory**. This changes which directory is the current directory, but the specific result depends on the argument:
-    * `cd x` moves **in** one level: it looks in the current directory for the directory named x and makes it the current directory.
-    * `cd ..` moves **out** one level: it finds the directory that contains the current directory, then makes that directory the current directory.
-    * `cd /` switches the current directory to the outermost directory, `/`.
-* `ls` means **list**. It prints out all of the files and directories immediately contained by the current directory:
-    * `123 abc` means that the current directory contains a file named `abc` with size `123`.
-    * `dir xyz` means that the current directory contains a directory named `xyz`.
-
-Given the commands and output in the example above, you can determine that the filesystem looks visually like this:
-
-```
-- / (dir)
+</code></pre>
+<p>The filesystem consists of a tree of files (plain data) and directories (which can contain other directories or files). The outermost directory is called <code>/</code>. You can navigate around the filesystem, moving into or out of directories and listing the contents of the directory you're currently in.</p>
+<p>Within the terminal output, lines that begin with <code>$</code> are <em>commands you executed</em>, very much like some modern computers:</p>
+<ul>
+<li><code>cd</code> means <em>change directory</em>. This changes which directory is the current directory, but the specific result depends on the argument:
+  <ul>
+  <li><code>cd x</code> moves <em>in</em> one level: it looks in the current directory for the directory named <code>x</code> and makes it the current directory.</li>
+  <li><code>cd ..</code> moves <em>out</em> one level: it finds the directory that contains the current directory, then makes that directory the current directory.</li>
+  <li><code>cd /</code> switches the current directory to the outermost directory, <code>/</code>.</li>
+  </ul>
+</li>
+<li><code>ls</code> means <em>list</em>. It prints out all of the files and directories immediately contained by the current directory:
+  <ul>
+  <li><code>123 abc</code> means that the current directory contains a file named <code>abc</code> with size <code>123</code>.</li>
+  <li><code>dir xyz</code> means that the current directory contains a directory named <code>xyz</code>.</li>
+  </ul>
+</li>
+</ul>
+<p>Given the commands and output in the example above, you can determine that the filesystem looks visually like this:</p>
+<pre><code>- / (dir)
   - a (dir)
     - e (dir)
       - i (file, size=584)
@@ -70,37 +62,30 @@ Given the commands and output in the example above, you can determine that the f
     - d.log (file, size=8033020)
     - d.ext (file, size=5626152)
     - k (file, size=7214296)
-```
-
-Here, there are four directories: `/` (the outermost directory), `a` and `d` (which are in `/`), and `e` (which is in `a`). These directories also contain files of various sizes.
-
-Since the disk is full, your first step should probably be to find directories that are good candidates for deletion. To do this, you need to determine the total size of each directory. The total size of a directory is the sum of the sizes of the files it contains, directly or indirectly. (Directories themselves do not count as having any intrinsic size.)
-
-The total sizes of the directories above can be found as follows:
-* The total size of directory `e` is **`584`** because it contains a single file `i` of size 584 and no other directories.
-* The directory `a` has total size **`94853`** because it contains files `f` (size `29116`), g (size `2557`), and `h.lst` (size `62596`), plus file `i` indirectly (a contains `e` which contains `i`).
-* Directory `d` has total size **`24933642`**.
-* As the outermost directory, `/` contains every file. Its total size is **`48381165`**, the sum of the size of every file.
-
-To begin, find all of the directories with a total size of **at most 100000**, then calculate the sum of their total sizes. In the example above, these directories are `a` and `e`; the sum of their total sizes is **`95437`** (94853 + 584). (As in this example, this process can count files more than once!)
-
-Find all of the directories with a total size of at most 100000. **What is the sum of the total sizes of those directories?**
-
-## Part Two
-
-Now, you're ready to choose a directory to delete.
-
-The total disk space available to the filesystem is `70000000`. To run the update, you need unused space of at least `30000000`. You need to find a directory you can delete that will **free up enough space** to run the update.
-
-In the example above, the total size of the outermost directory (and thus the total amount of used space) is `48381165`; this means that the size of the **unused** space must currently be `21618835`, which isn't quite the `30000000` required by the update. Therefore, the update still requires a directory with total size of at least `8381165` to be deleted before it can run.
-
-To achieve this, you have the following options:
-
-* Delete directory `e`, which would increase unused space by `584`.
-* Delete directory `a`, which would increase unused space by `94853`.
-* Delete directory `d`, which would increase unused space by `24933642`.
-* Delete directory `/`, which would increase unused space by `48381165`.
-
-Directories `e` and `a` are both too small; deleting them would not free up enough space. However, directories `d` and `/` are both big enough! Between these, choose the **smallest**: `d`, increasing unused space by **`24933642`**.
-
-Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. **What is the total size of that directory?**
+</code></pre>
+<p>Here, there are four directories: <code>/</code> (the outermost directory), <code>a</code> and <code>d</code> (which are in <code>/</code>), and <code>e</code> (which is in <code>a</code>). These directories also contain files of various sizes.</p>
+<p>Since the disk is full, your first step should probably be to find directories that are good candidates for deletion. To do this, you need to determine the <em>total size</em> of each directory. The total size of a directory is the sum of the sizes of the files it contains, directly or indirectly. (Directories themselves do not count as having any intrinsic size.)</p>
+<p>The total sizes of the directories above can be found as follows:</p>
+<ul>
+<li>The total size of directory <code>e</code> is <em>584</em> because it contains a single file <code>i</code> of size 584 and no other directories.</li>
+<li>The directory <code>a</code> has total size <em>94853</em> because it contains files <code>f</code> (size 29116), <code>g</code> (size 2557), and <code>h.lst</code> (size 62596), plus file <code>i</code> indirectly (<code>a</code> contains <code>e</code> which contains <code>i</code>).</li>
+<li>Directory <code>d</code> has total size <em>24933642</em>.</li>
+<li>As the outermost directory, <code>/</code> contains every file. Its total size is <em>48381165</em>, the sum of the size of every file.</li>
+</ul>
+<p>To begin, find all of the directories with a total size of <em>at most 100000</em>, then calculate the sum of their total sizes. In the example above, these directories are <code>a</code> and <code>e</code>; the sum of their total sizes is <code><em>95437</em></code> (94853 + 584). (As in this example, this process can count files more than once!)</p>
+<p>Find all of the directories with a total size of at most 100000. <em>What is the sum of the total sizes of those directories?</em></p>
+</article>
+<article class="day-desc"><h2 id="part2">--- Part Two ---</h2><p>Now, you're ready to choose a directory to delete.</p>
+<p>The total disk space available to the filesystem is <code><em>70000000</em></code>. To run the update, you need unused space of at least <code><em>30000000</em></code>. You need to find a directory you can delete that will <em>free up enough space</em> to run the update.</p>
+<p>In the example above, the total size of the outermost directory (and thus the total amount of used space) is <code>48381165</code>; this means that the size of the <em>unused</em> space must currently be <code>21618835</code>, which isn't quite the <code>30000000</code> required by the update. Therefore, the update still requires a directory with total size of at least <code>8381165</code> to be deleted before it can run.</p>
+<p>To achieve this, you have the following options:</p>
+<ul>
+<li>Delete directory <code>e</code>, which would increase unused space by <code>584</code>.</li>
+<li>Delete directory <code>a</code>, which would increase unused space by <code>94853</code>.</li>
+<li>Delete directory <code>d</code>, which would increase unused space by <code>24933642</code>.</li>
+<li>Delete directory <code>/</code>, which would increase unused space by <code>48381165</code>.</li>
+</ul>
+<p>Directories <code>e</code> and <code>a</code> are both too small; deleting them would not free up enough space. However, directories <code>d</code> and <code>/</code> are both big enough! Between these, choose the <em>smallest</em>: <code>d</code>, increasing unused space by <code><em>24933642</em></code>.</p>
+<p>Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. <em>What is the total size of that directory?</em></p>
+</article>
+</main>
