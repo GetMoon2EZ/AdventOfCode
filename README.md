@@ -5,8 +5,8 @@ In this repo are my solutions to the Advent Of Code challenges. As I discovered 
 Each challenge's solution can be found in `/YEAR/day_N`. Running `run.sh` will build and run the solution in the current directory.
 
 Current status:
-* 2022 - In progress
-* 2021 - In progress
+* [2022](./2022/) - In progress
+* [2021](./2021/) - In progress
 * 2020 - Not started
 * 2019 - Not started
 * 2018 - Not started
