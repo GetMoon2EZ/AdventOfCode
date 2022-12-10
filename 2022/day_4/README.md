@@ -1,31 +1,22 @@
-# Day 4: Camp Cleanup
-
-## Part One
-
-Space needs to be cleared before the last supplies can be unloaded from the ships, and so several Elves have been assigned the job of cleaning up sections of the camp. Every section has a unique **ID number**, and each Elf is assigned a range of section IDs.
-
-However, as some of the Elves compare their section assignments with each other, they've noticed that many of the assignments overlap. To try to quickly find overlaps and reduce duplicated effort, the Elves pair up and make a **big list of the section assignments for each pair** (your puzzle input).
-
-For example, consider the following list of section assignment pairs:
-
-```
-2-4,6-8
+<main>
+<article class="day-desc"><h1>--- Day 4: Camp Cleanup ---</h1><h2>--- Part One ---</h2><p>Space needs to be cleared before the last supplies can be unloaded from the ships, and so several Elves have been assigned the job of cleaning up sections of the camp. Every section has a unique <em>ID number</em>, and each Elf is assigned a range of section IDs.</p>
+<p>However, as some of the Elves compare their section assignments with each other, they've noticed that many of the assignments <em>overlap</em>. To try to quickly find overlaps and reduce duplicated effort, the Elves pair up and make a <em>big list of the section assignments for each pair</em> (your puzzle input).</p>
+<p>For example, consider the following list of section assignment pairs:</p>
+<pre><code>2-4,6-8
 2-3,4-5
 5-7,7-9
 2-8,3-7
 6-6,4-6
 2-6,4-8
-```
-
-For the first few pairs, this list means:
-* Within the first pair of Elves, the first Elf was assigned sections `2-4` (sections `2`, `3`, and `4`), while the second Elf was assigned sections `6-8` (sections `6`, `7`, `8`).
-* The Elves in the second pair were each assigned two sections.
-* The Elves in the third pair were each assigned three sections: one got sections `5`, `6`, and `7`, while the other also got `7`, plus `8` and `9`.
-
-This example list uses single-digit section IDs to make it easier to draw; your actual list might contain larger numbers. Visually, these pairs of section assignments look like this:
-
-```
-.234.....  2-4
+</code></pre>
+<p>For the first few pairs, this list means:</p>
+<ul>
+<li>Within the first pair of Elves, the first Elf was assigned sections <code>2-4</code> (sections <code>2</code>, <code>3</code>, and <code>4</code>), while the second Elf was assigned sections <code>6-8</code> (sections <code>6</code>, <code>7</code>, <code>8</code>).</li>
+<li>The Elves in the second pair were each assigned two sections.</li>
+<li>The Elves in the third pair were each assigned three sections: one got sections <code>5</code>, <code>6</code>, and <code>7</code>, while the other also got <code>7</code>, plus <code>8</code> and <code>9</code>.</li>
+</ul>
+<p>This example list uses single-digit section IDs to make it easier to draw; your actual list might contain larger numbers. Visually, these pairs of section assignments look like this:</p>
+<pre><code>.234.....  2-4
 .....678.  6-8
 
 .23......  2-3
@@ -42,22 +33,19 @@ This example list uses single-digit section IDs to make it easier to draw; your 
 
 .23456...  2-6
 ...45678.  4-8
-```
-
-Some of the pairs have noticed that one of their assignments **fully contains** the other. For example, `2-8` fully contains `3-7`, and `6-6` is fully contained by `4-6`. In pairs where one assignment fully contains the other, one Elf in the pair would be exclusively cleaning sections their partner will already be cleaning, so these seem like the most in need of reconsideration. In this example, there are **`2`** such pairs.
-
-**In how many assignment pairs does one range fully contain the other?**
-
-## Part Two
-
-It seems like there is still quite a bit of duplicate work planned. Instead, the Elves would like to know the number of pairs that **overlap at all**.
-
-In the above example, the first two pairs (`2-4,6-8` and `2-3,4-5`) don't overlap, while the remaining four pairs (`5-7,7-9`, `2-8,3-7`, `6-6,4-6`, and `2-6,4-8`) do overlap:
-* `5-7,7-9` overlaps in a single section, `7`.
-* `2-8,3-7` overlaps all of the sections `3` through `7`.
-* `6-6,4-6` overlaps in a single section, `6`.
-* `2-6,4-8` overlaps in sections `4`, `5`, and `6`.
-
-So, in this example, the number of overlapping assignment pairs is **`4`**.
-
-**In how many assignment pairs do the ranges overlap?**
+</code></pre>
+<p>Some of the pairs have noticed that one of their assignments <em>fully contains</em> the other. For example, <code>2-8</code> fully contains <code>3-7</code>, and <code>6-6</code> is fully contained by <code>4-6</code>. In pairs where one assignment fully contains the other, one Elf in the pair would be exclusively cleaning sections their partner will already be cleaning, so these seem like the most in need of reconsideration. In this example, there are <code><em>2</em></code> such pairs.</p>
+<p><em>In how many assignment pairs does one range fully contain the other?</em></p>
+</article>
+<article class="day-desc"><h2 id="part2">--- Part Two ---</h2><p>It seems like there is still quite a bit of duplicate work planned. Instead, the Elves would <span title="If you like this, you&#39;ll *love* axis-aligned bounding box intersection testing.">like</span> to know the number of pairs that <em>overlap at all</em>.</p>
+<p>In the above example, the first two pairs (<code>2-4,6-8</code> and <code>2-3,4-5</code>) don't overlap, while the remaining four pairs (<code>5-7,7-9</code>, <code>2-8,3-7</code>, <code>6-6,4-6</code>, and <code>2-6,4-8</code>) do overlap:</p>
+<ul>
+<li><code>5-7,7-9</code> overlaps in a single section, <code>7</code>.</li>
+<li><code>2-8,3-7</code> overlaps all of the sections <code>3</code> through <code>7</code>.</li>
+<li><code>6-6,4-6</code> overlaps in a single section, <code>6</code>.</li>
+<li><code>2-6,4-8</code> overlaps in sections <code>4</code>, <code>5</code>, and <code>6</code>.</li>
+</ul>
+<p>So, in this example, the number of overlapping assignment pairs is <code><em>4</em></code>.</p>
+<p><em>In how many assignment pairs do the ranges overlap?</em></p>
+</article>
+</main>
