@@ -2,7 +2,6 @@ use std::fs::{File};
 use std::io::{BufReader, BufRead, Lines};
 use clap::{Parser};
 use std::str::FromStr;
-use std::num::ParseIntError;
 
 #[derive(Debug, Parser)]
 struct Arg {
@@ -24,10 +23,7 @@ fn read_lines(filename: &str) -> Lines<BufReader<File>> {
 #[derive(Debug)]
 enum Operation {
     Add(i64),
-    Subtract(i64),
     Multiply(i64),
-    Divide(i64),
-    Modulus(i64),
     Square,
 }
 
@@ -35,60 +31,27 @@ impl Operation {
     fn apply(&self, value: i64) -> i64 {
         match self {
             Operation::Add(x) => { return value + x; },
-            Operation::Subtract(x) => { return value - x; },
             Operation::Multiply(x) => { return value * x; },
-            Operation::Divide(x) => { return value / x; },
-            Operation::Modulus(x) => { return value % x; },
             Operation::Square => { return value * value; },
         }
     }
 }
 
 #[derive(Debug)]
-enum TestComparator {
-    Equal,
-    Superior,
-    SuperiorOrEqual,
-    Inferior,
-    InferiorOrEqual,
-}
-
-impl TestComparator {
-    fn apply(&self, left: i64, right: i64) -> bool {
-        match self {
-            TestComparator::Equal => { return left == right },
-            TestComparator::Superior => { return left > right },
-            TestComparator::SuperiorOrEqual => { return left >= right },
-            TestComparator::Inferior => { return left < right },
-            TestComparator::InferiorOrEqual => { return left <= right },
-        }
-    }
-}
-
-#[derive(Debug)]
 struct Test {
-    // Value of the left operand
-    left_operand: i64,
-    // Operation to apply to left_operand
-    operation: Operation,
-    // Value of the right operand
-    right_operand: i64,
-    // How to compare the operands
-    comparator: TestComparator,
+    // The divisor
+    divisible_by: i64,
     // If true: pass to monkey ...
-    if_true: i32,
+    if_true: usize,
     // If false: pass to monkey ...
-    if_false: i32,
+    if_false: usize,
 }
 
 impl Test {
-    fn eval(&self) -> i32 {
-        let left_operand = self.operation.apply(self.left_operand);
-        let test_result = self.comparator.apply(left_operand, self.right_operand);
-        if test_result {
+    fn eval(&self, value: i64) -> usize {
+        if value % self.divisible_by == 0 {
             return self.if_true;
         } else {
-            // a not divisible by p
             return self.if_false;
         }
     }
@@ -137,36 +100,26 @@ fn parse_items(line: &str) -> Vec<i64> {
 
 fn parse_operation(line: &str) -> Operation {
     let op_split = line.strip_prefix("  Operation: new = old ").unwrap().split(" ").collect::<Vec<&str>>();
-    let mut operation = Operation::Add(0);
-    if op_split[0] == "*" && op_split[1] == "old" {
-        operation = Operation::Square;
+    let operation = if op_split[0] == "*" && op_split[1] == "old" {
+        Operation::Square
     } else {
         let num = op_split[1].parse::<i64>().unwrap();
-        operation = match op_split[0] {
+        match op_split[0] {
             "+" => { Operation::Add(num) },
-            "-" => { Operation::Subtract(num) },
             "*" => { Operation::Multiply(num) },
-            "/" => { Operation::Divide(num) },
             _ => { Operation::Add(0) },
-        };
-    }
+        }
+    };
     return operation;
 }
 
 fn parse_test(test_line: &str, if_true_line: &str, if_false_line: &str) -> Test {
-    let if_true = if_true_line.strip_prefix("    If true: throw to monkey ").unwrap().parse::<i32>().unwrap();
-    let if_false = if_false_line.strip_prefix("    If false: throw to monkey ").unwrap().parse::<i32>().unwrap();
-
-    // Only "is divisible by" is supported for now;
-    let operation = Operation::Modulus(
-        test_line.strip_prefix("  Test: divisible by ").unwrap().parse::<i64>().unwrap()
-    );
+    let if_true = if_true_line.strip_prefix("    If true: throw to monkey ").unwrap().parse::<u32>().unwrap() as usize;
+    let if_false = if_false_line.strip_prefix("    If false: throw to monkey ").unwrap().parse::<u32>().unwrap() as usize;
+    let divisible_by = test_line.strip_prefix("  Test: divisible by ").unwrap().parse::<i64>().unwrap();
 
     Test {
-        left_operand: 0,
-        operation,
-        right_operand: 0,
-        comparator: TestComparator::Equal,
+        divisible_by,
         if_true,
         if_false,
     }
@@ -186,34 +139,26 @@ fn get_monkey_business_level(monkeys: &Vec<Monkey>, n: i32) -> i64{
         }
     }
 
-    let mut ret = 1;
-    for value in best.iter() {
-        ret *= value;
-    }
-    return ret;
+    return best.iter().fold(1, |res, n| res * n);
 }
 
 fn simulate_rounds(monkeys: &mut Vec<Monkey>, n: i32, relief: bool) {
-    let product = monkeys.iter()
-        .fold(1, |res, m| match m.test.operation {
-            Operation::Modulus(x) => { res * x },
-            _ => { res },
-        });
+    let product = monkeys.iter().fold(1, |res, m| res * m.test.divisible_by);
 
-    for round in 0..n {
+    for _ in 0..n {
         for i_monkey in 0..monkeys.len() {
             monkeys[i_monkey].inspection_count += monkeys[i_monkey].items.len() as i64;
             // Go though each item for current monkey
             let mut i = 0;
             while i < monkeys[i_monkey].items.len() {
-                let mut item = monkeys[i_monkey].operation.apply(monkeys[i_monkey].items[i]);
+                let mut item = monkeys[i_monkey].items[i];
+                item = monkeys[i_monkey].operation.apply(item);
                 if relief {
                     item /= 3;
                 } else {
                     item = item % product;
                 }
-                monkeys[i_monkey].test.left_operand = item;
-                let give_to = monkeys[i_monkey].test.eval() as usize;
+                let give_to = monkeys[i_monkey].test.eval(item);
                 if give_to != i_monkey {
                     monkeys[give_to].items.push(item);
                     monkeys[i_monkey].items.remove(i);
