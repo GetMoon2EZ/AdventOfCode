@@ -11,6 +11,11 @@ struct Arg {
 
     /// Input file
     filename: String,
+
+    /// Additional challenge parameter:
+    ///     - row to analyze for challenge 1
+    ///     - maximum possible beacon position for challenge 2
+    pb_param: i32,
 }
 
 fn read_lines(filename: &str) -> Lines<BufReader<File>> {
@@ -94,24 +99,22 @@ fn get_row_coverage(positions: &Vec<(Coordinates, Coordinates)>, row: i32) -> us
 fn find_distress_beacon(positions: &Vec<(Coordinates, Coordinates)>, extremum: Coordinates) -> Coordinates {
     let mut intervals: HashMap<i32, Vec<(i32, i32)>> = HashMap::new();
     for (sensor_pos, beacon_pos) in positions.iter() {
-        let distance = sensor_pos.get_manhattan_distance_to(*beacon_pos); // 7
-        let min_y = max(sensor_pos.y - distance, 0); // 18 - 7 = 11
-        let max_y = min(sensor_pos.y + distance, extremum.y); // 18 + 7 = 25 -> 20
-        for current_y in min_y..=max_y { // 19
+        let distance = sensor_pos.get_manhattan_distance_to(*beacon_pos);
+        let min_y = max(sensor_pos.y - distance, 0);
+        let max_y = min(sensor_pos.y + distance, extremum.y);
+        for current_y in min_y..=max_y {
             let spare_distance = if sensor_pos.y <= current_y {
                 (current_y - (sensor_pos.y + distance)).abs()
             } else {
                 (current_y - (sensor_pos.y - distance)).abs()
             };
-            let min_x = max(sensor_pos.x - spare_distance, 0); // 0
-            let max_x = min(sensor_pos.x + spare_distance, extremum.x); // 4
+            let min_x = max(sensor_pos.x - spare_distance, 0);
+            let max_x = min(sensor_pos.x + spare_distance, extremum.x);
             intervals.entry(current_y)
                 .and_modify(|v| v.push((min_x, max_x)))
                 .or_insert(vec!((min_x, max_x)));
         }
     }
-
-    // println!("[DEBUG] {:#?}", intervals);
 
     for y in 0..=extremum.y {
         let mut left = 0;
@@ -132,23 +135,26 @@ fn find_distress_beacon(positions: &Vec<(Coordinates, Coordinates)>, extremum: C
             }
         }
         if left < right {
+            #[cfg(debug_assertions)]
             println!("[DEBUG] Found gap at {}, {}", left + 1, y);
             return Coordinates { x: left + 1, y };
         }
     }
+
+    #[cfg(debug_assertions)]
     println!("[DEBUG] Did not find gap");
     return extremum;
 }
 
-fn solve_problem_1(filename: &str) {
+fn solve_problem_1(filename: &str, row_number: i32) {
     let positions = parse_input(filename);
-    let ans = get_row_coverage(&positions, 2000000);
+    let ans = get_row_coverage(&positions, row_number);
     println!("Answer: {:?}", ans);
 }
 
-fn solve_problem_2(filename: &str) {
+fn solve_problem_2(filename: &str, max_pos: i32) {
     let positions = parse_input(filename);
-    let distress_beacon = find_distress_beacon(&positions, Coordinates { x: 4000000, y: 4000000 });
+    let distress_beacon = find_distress_beacon(&positions, Coordinates { x: max_pos, y: max_pos });
     let ans = distress_beacon.get_tunning_frequency();
     println!("Answer: {:?}", ans);
 }
@@ -157,8 +163,8 @@ fn main() {
     let arg = Arg::parse();
 
     match arg.challenge_num {
-        1 => { solve_problem_1(&arg.filename); },
-        2 => { solve_problem_2(&arg.filename); },
+        1 => { solve_problem_1(&arg.filename, arg.pb_param); },
+        2 => { solve_problem_2(&arg.filename, arg.pb_param); },
         n => { panic!("[ERROR] Incorrect challenge number {}", n); }
     }
 }
