@@ -1,0 +1,1 @@
+../day_template/run.sh
