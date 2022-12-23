@@ -1,8 +1,19 @@
+use clap::Parser;
 use std::collections::HashMap;
 use std::fs;
 
 type MonkeyMap = HashMap<String, Monkey>;
 
+#[derive(Debug, Parser)]
+struct Arg {
+    /// Challenge to run (1 or 2)
+    challenge_num: u8,
+
+    /// Input file
+    filename: String,
+}
+
+#[derive(PartialEq)]
 enum Operator {
     Integer(i64),
     Plus,
@@ -16,45 +27,47 @@ enum Operator {
 impl From<&str> for Operator {
     fn from(s: &str) -> Self {
         match s {
-            "+" => { Self::Plus },
-            "-" => { Self::Minus },
-            "*" => { Self::Multiply },
-            "/" => { Self::Divide },
-            _ => { Self::Unknown }, // Should never happen
+            "+" => Self::Plus,
+            "-" => Self::Minus,
+            "*" => Self::Multiply,
+            "/" => Self::Divide,
+            _ => Self::Unknown, // Should never happen
         }
     }
+}
+
+struct Monkey {
+    left: String,
+    right: String,
+    operator: Operator,
 }
 
 impl Monkey {
     fn can_calculate(&self, map: &MonkeyMap) -> bool {
         match self.operator {
-            Operator::Integer(_) => { true },
-            Operator::Unknown => { false },
+            Operator::Integer(_) => true,
+            Operator::Unknown => false,
             _ => {
-                map.get(&self.left).unwrap().can_calculate(map) &&
-                map.get(&self.right).unwrap().can_calculate(map)
+                map.get(&self.left).unwrap().can_calculate(map)
+                    && map.get(&self.right).unwrap().can_calculate(map)
             }
         }
     }
 
     fn solve(&self, map: &MonkeyMap) -> i64 {
         match self.operator {
-            Operator::Integer(x) => { x },
+            Operator::Integer(x) => x,
             Operator::Plus => {
-                map.get(&self.left).unwrap().solve(map) +
-                map.get(&self.right).unwrap().solve(map)
+                map.get(&self.left).unwrap().solve(map) + map.get(&self.right).unwrap().solve(map)
             }
             Operator::Minus => {
-                map.get(&self.left).unwrap().solve(map) -
-                map.get(&self.right).unwrap().solve(map)
+                map.get(&self.left).unwrap().solve(map) - map.get(&self.right).unwrap().solve(map)
             }
             Operator::Multiply => {
-                map.get(&self.left).unwrap().solve(map) *
-                map.get(&self.right).unwrap().solve(map)
+                map.get(&self.left).unwrap().solve(map) * map.get(&self.right).unwrap().solve(map)
             }
             Operator::Divide => {
-                map.get(&self.left).unwrap().solve(map) /
-                map.get(&self.right).unwrap().solve(map)
+                map.get(&self.left).unwrap().solve(map) / map.get(&self.right).unwrap().solve(map)
             }
             _ => {
                 panic!("Cannot solve for X");
@@ -62,9 +75,25 @@ impl Monkey {
         }
     }
 
+    fn solve_for_x(&self, map: &MonkeyMap) -> i64 {
+        if self.operator != Operator::Equals {
+            panic!("[ERROR] solve_for_x must be called on a monkey who's operation is Equals");
+        }
+
+        let left = map.get(&self.left).unwrap();
+        let right = map.get(&self.right).unwrap();
+        if left.can_calculate(map) {
+            let target = left.solve(map);
+            right.solve_for_x_recursive(target, map)
+        } else {
+            let target = right.solve(map);
+            left.solve_for_x_recursive(target, map)
+        }
+    }
+
     fn solve_for_x_recursive(&self, target: i64, map: &MonkeyMap) -> i64 {
         match self.operator {
-            Operator::Integer(x) => { x },
+            Operator::Integer(x) => x,
             Operator::Plus => {
                 let left = map.get(&self.left).unwrap();
                 let right = map.get(&self.right).unwrap();
@@ -77,7 +106,7 @@ impl Monkey {
                     let new_target = target - x;
                     return left.solve_for_x_recursive(new_target, map);
                 }
-            },
+            }
             Operator::Minus => {
                 let left = map.get(&self.left).unwrap();
                 let right = map.get(&self.right).unwrap();
@@ -90,7 +119,7 @@ impl Monkey {
                     let new_target = x + target;
                     return left.solve_for_x_recursive(new_target, map);
                 }
-            },
+            }
             Operator::Multiply => {
                 let left = map.get(&self.left).unwrap();
                 let right = map.get(&self.right).unwrap();
@@ -103,7 +132,7 @@ impl Monkey {
                     let new_target = target / x;
                     return left.solve_for_x_recursive(new_target, map);
                 }
-            },
+            }
             Operator::Divide => {
                 let left = map.get(&self.left).unwrap();
                 let right = map.get(&self.right).unwrap();
@@ -117,29 +146,23 @@ impl Monkey {
                     return left.solve_for_x_recursive(new_target, map);
                 }
             }
-            Operator::Unknown => { target },
-            _ => { panic!("Should not happen"); },
+            Operator::Unknown => target,
+            _ => {
+                panic!("Should not happen");
+            }
         }
     }
-}
-
-struct Monkey {
-    left: String,
-    right: String,
-    operator: Operator,
 }
 
 impl From<&str> for Monkey {
     fn from(s: &str) -> Self {
         let value = s.parse::<i64>();
         match value {
-            Ok(num) => {
-                Self {
-                    left: String::from(""),
-                    right: String::from(""),
-                    operator: Operator::Integer(num),
-                }
-            }
+            Ok(num) => Self {
+                left: String::from(""),
+                right: String::from(""),
+                operator: Operator::Integer(num),
+            },
             Err(_) => {
                 let split = s.split(" ").collect::<Vec<&str>>();
                 Self {
@@ -178,37 +201,32 @@ fn modify_map(map: &mut MonkeyMap) {
     map.insert(s_humn, humn);
 }
 
-fn solve_for_x(map: &MonkeyMap) -> i64 {
+fn solve_problem_1(filename: &str) {
+    let map = parse_input(filename);
+    let ans = map.get(&String::from("root")).unwrap().solve(&map);
+    println!("Answer: {:?}", ans);
+}
+
+fn solve_problem_2(filename: &str) {
+    let mut map = parse_input(filename);
+    modify_map(&mut map);
     let root = map.get(&String::from("root")).unwrap();
-    let left = map.get(&root.left).unwrap();
-    let right = map.get(&root.right).unwrap();
-    if left.can_calculate(map) {
-        let target = left.solve(map);
-        right.solve_for_x_recursive(target, map)
-    } else {
-        let target = right.solve(map);
-        left.solve_for_x_recursive(target, map)
-    }
+    let ans = root.solve_for_x(&map);
+    println!("Answer: {:?}", ans);
 }
 
 fn main() {
-    // Part 1
-    let map = parse_input("test.txt");
-    let ans = map.get(&String::from("root")).unwrap().solve(&map);
-    println!("Control : {}", ans);
+    let arg = Arg::parse();
 
-    let map = parse_input("input.txt");
-    let ans = map.get(&String::from("root")).unwrap().solve(&map);
-    println!("Answer : {}", ans);
-
-    // Part 2
-    let mut map = parse_input("test.txt");
-    modify_map(&mut map);
-    let ans = solve_for_x(&map);
-    println!("Control : {}", ans);
-
-    let mut map = parse_input("input.txt");
-    modify_map(&mut map);
-    let ans = solve_for_x(&map);
-    println!("Answer : {}", ans);
+    match arg.challenge_num {
+        1 => {
+            solve_problem_1(&arg.filename);
+        }
+        2 => {
+            solve_problem_2(&arg.filename);
+        }
+        n => {
+            panic!("[ERROR] Incorrect challenge number {}", n);
+        }
+    }
 }
